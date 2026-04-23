@@ -65,6 +65,7 @@ export default function Home() {
         incrementLimit(); // Only increment if it actually used the API
       }
 
+      localStorage.setItem(`retro_result_${data.videoId}`, JSON.stringify(data.result));
       router.push(`/result/${data.videoId}`);
     } catch (err) {
       setError(err.message);
