@@ -1,31 +1,74 @@
+"use client";
 import Link from 'next/link';
-import { getCache } from '@/lib/cache';
-import { redirect } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import CopyPromptButton from './CopyPromptButton';
 import AdPlaceholder from '@/app/components/AdPlaceholder';
 import ShareButtons from '@/app/components/ShareButtons';
+import { useEffect, useState } from 'react';
 
-export async function generateMetadata({ params }) {
-  const resolvedParams = await params;
-  const data = getCache(resolvedParams.id);
-  
-  if (!data) return { title: 'Not Found | Retro Paradox' };
-  
-  return {
-    title: `AI Prompt for ${data.title} - Retro Paradox`,
-    description: `Discover the AI generated prompt simulating the cinematic vibe of ${data.title}.`,
-  };
-}
+export default function ResultPage() {
+  const params = useParams();
+  const id = params?.id;
 
-export default async function ResultPage({ params }) {
-  const resolvedParams = await params;
-  const { id } = resolvedParams;
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Retrieve analysis from server-side cache
-  const data = getCache(id);
+  useEffect(() => {
+    if (!id) return;
+    
+    // 1. Try to load from LocalStorage first (instant load)
+    const saved = localStorage.getItem(`retro_result_${id}`);
+    if (saved) {
+      setData(JSON.parse(saved));
+      setLoading(false);
+      return;
+    }
 
-  if (!data) {
-    redirect('/');
+    // 2. If not found (e.g. shared link), fetch on the fly!
+    const fetchAnalysis = async () => {
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: `https://youtu.be/${id}` })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Failed to analyze video.');
+        
+        localStorage.setItem(`retro_result_${id}`, JSON.stringify(json.result));
+        setData(json.result);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalysis();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '5rem 1rem', textAlign: 'center', minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <h2 className="comic-header" style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-black)', textShadow: '4px 4px 0 var(--color-yellow)' }}>
+          ANALYZING...
+        </h2>
+        <p style={{ fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>
+          Please wait up to 60 seconds.<br/>Our AI is dissecting the video magic! ⚡
+        </p>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div style={{ padding: '5rem 1rem', textAlign: 'center', minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <h2 className="comic-header" style={{ fontSize: '3rem', color: 'var(--color-red)', marginBottom: '1rem' }}>ERROR!</h2>
+        <p style={{ fontWeight: 900, fontSize: '1.2rem', marginBottom: '2rem', textTransform: 'uppercase' }}>{error || "Result not found."}</p>
+        <Link href="/" className="comic-button">← TRY ANOTHER VIDEO</Link>
+      </div>
+    );
   }
 
   const { title, analysis } = data;
