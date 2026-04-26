@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
   title: "Retro Paradox | AI Analyzer",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
             © 2026 Retro Paradox | AI Prompt Lab
           </p>
         </footer>
+        <Analytics />
       </body>
     </html>
   );
