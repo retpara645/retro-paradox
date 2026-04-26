@@ -41,9 +41,9 @@ function extractYouTubeId(url) {
 }
 
 function parseDuration(isoDuration) {
-  if (!isoDuration) return "Unknown";
+  if (!isoDuration) return { human: "Unknown", totalSeconds: 0 };
   const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if (!match) return isoDuration;
+  if (!match) return { human: isoDuration, totalSeconds: 0 };
   const h = match[1] ? parseInt(match[1]) : 0;
   const m = match[2] ? parseInt(match[2]) : 0;
   const s = match[3] ? parseInt(match[3]) : 0;
@@ -52,7 +52,9 @@ function parseDuration(isoDuration) {
   if (h > 0) result.push(`${h} hours`);
   if (m > 0) result.push(`${m} minutes`);
   if (s > 0) result.push(`${s} seconds`);
-  return result.join(' ') || "0 seconds";
+  
+  const totalSeconds = h * 3600 + m * 60 + s;
+  return { human: result.join(' ') || "0 seconds", totalSeconds };
 }
 
 export async function POST(req) {
@@ -96,7 +98,9 @@ export async function POST(req) {
     const description = snippet.description;
     
     const durationIso = ytData.items[0].contentDetails?.duration;
-    const humanDuration = parseDuration(durationIso);
+    const durationInfo = parseDuration(durationIso);
+    const humanDuration = durationInfo.human;
+    const totalSeconds = durationInfo.totalSeconds;
     
     const thumbnails = snippet.thumbnails;
     const thumbnailObj = thumbnails.maxres || thumbnails.high || thumbnails.medium || thumbnails.default;
@@ -120,9 +124,9 @@ export async function POST(req) {
     const prompt = `Analyze this video based on its thumbnail, title, and description.
 Title: ${title}
 Description: ${description}
-Actual Video Duration: ${humanDuration}
+Actual Video Duration: ${humanDuration} (${totalSeconds} total seconds)
 
-CRITICAL INSTRUCTION: The actual video duration is exactly ${humanDuration}. Your generated time_codes MUST NOT exceed this duration! Distribute the scenes logically within the ${humanDuration} timeframe. Do not hallucinate long durations for short videos.
+CRITICAL RULE: The video is EXACTLY ${totalSeconds} seconds long. Your generated "time_code" values MUST NOT exceed ${totalSeconds} seconds under any circumstances! The final scene's end time MUST be less than or equal to the video's total duration. For example, if the video is 8 seconds, the maximum timecode is 00:08. DO NOT hallucinate extra time.
 
 Based on its visual style, lighting, and elements, create a detailed, simulated storyboard breakdown for AI video/image generation. Since you only have the thumbnail, imagine scenes that would accurately fit into this ${humanDuration} video.
 Also, accurately determine the aspect ratio of the video (e.g., output "9:16" if it's a vertical/Shorts video, or "16:9" if it's a standard landscape video).
