@@ -14,6 +14,7 @@ module.exports = {
       fontFamily: {
         bangers: ['Bangers', 'cursive'],
         space: ['"Space Grotesk"', 'sans-serif'],
+        mono: ['"Space Mono"', 'monospace'],
       },
       boxShadow: {
         'comic': '8px 8px 0px 0px rgba(0,0,0,1)',
