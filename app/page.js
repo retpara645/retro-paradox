@@ -62,7 +62,7 @@ export default function Home() {
         
         {status === 'idle' ? (
           <>
-            <h2 className="text-2xl md:text-3xl font-bangers tracking-wide text-black text-center mb-4">
+            <h2 className="text-2xl md:text-3xl font-black text-black text-center mb-4">
               DROP A YOUTUBE URL AND WATCH THE AI GENERATE A PROMPT BASED ON ITS VIBE!
             </h2>
 
@@ -71,21 +71,21 @@ export default function Home() {
               placeholder="HTTPS://YOUTU.BE/..."
               value={url} 
               onChange={(e) => setUrl(e.target.value)}
-              className="p-5 bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold text-xl outline-none focus:bg-gray-100 transition-colors placeholder-gray-300 w-full"
+              className="p-5 bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-black text-xl outline-none focus:bg-gray-100 transition-colors placeholder-gray-300 w-full"
             />
 
             <button 
               onClick={handleAnalyze}
               disabled={!url}
-              className="w-full bg-[#FF0000] text-white font-bangers tracking-wider text-4xl py-5 mt-2 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50 disabled:pointer-events-none"
+              className="w-full bg-[#FF0000] text-white font-black text-3xl md:text-4xl py-5 mt-2 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50 disabled:pointer-events-none"
             >
               GENERATE PROMPT!
             </button>
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-10 gap-6">
-            <h2 className="text-5xl font-bangers text-black drop-shadow-[2px_2px_0_rgba(255,0,0,1)] animate-pulse">ANALYZING VIBE...</h2>
-            <div className="font-bold text-xl bg-black text-white inline-block px-6 py-3 border-4 border-[#FF0000] transform -rotate-2 shadow-[4px_4px_0_rgba(0,0,0,1)]">
+            <h2 className="text-5xl font-black text-black drop-shadow-[2px_2px_0_rgba(255,0,0,1)] animate-pulse">ANALYZING VIBE...</h2>
+            <div className="font-black text-xl bg-black text-white inline-block px-6 py-3 border-4 border-[#FF0000] transform -rotate-2 shadow-[4px_4px_0_rgba(0,0,0,1)]">
               EXTRACTING VISUALS
             </div>
           </div>

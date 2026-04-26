@@ -44,9 +44,9 @@ export default function ResultPage() {
     return (
       <main className="min-h-screen bg-[#FFFF00] p-4 flex flex-col items-center justify-center font-space text-black" style={{ backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.15) 2px, transparent 2px)', backgroundSize: '20px 20px' }}>
         <div className="bg-white p-8 border-4 border-black shadow-[8px_8px_0_rgba(0,0,0,1)] text-center">
-          <h2 className="text-4xl font-bangers text-[#FF0000] mb-4">ERROR</h2>
+          <h2 className="text-4xl font-black text-[#FF0000] mb-4">ERROR</h2>
           <p className="font-bold text-xl">{error}</p>
-          <a href="/" className="mt-6 inline-block bg-[#002366] text-white px-6 py-3 border-4 border-black font-bangers text-2xl shadow-[4px_4px_0_rgba(0,0,0,1)] hover:bg-[#003399]">BACK HOME</a>
+          <a href="/" className="mt-6 inline-block bg-[#002366] text-white px-6 py-3 border-4 border-black font-black text-xl shadow-[4px_4px_0_rgba(0,0,0,1)] hover:bg-[#003399]">BACK HOME</a>
         </div>
       </main>
     );
@@ -55,7 +55,7 @@ export default function ResultPage() {
   if (!data) {
     return (
       <main className="min-h-screen bg-[#FFFF00] p-4 flex flex-col items-center justify-center font-space text-black" style={{ backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.15) 2px, transparent 2px)', backgroundSize: '20px 20px' }}>
-        <h2 className="text-5xl font-bangers text-black drop-shadow-[2px_2px_0_rgba(255,0,0,1)] animate-pulse">LOADING RESULT...</h2>
+        <h2 className="text-5xl font-black text-black drop-shadow-[2px_2px_0_rgba(255,0,0,1)] animate-pulse">LOADING RESULT...</h2>
       </main>
     );
   }
@@ -88,7 +88,7 @@ export default function ResultPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <button 
             onClick={handleCopy}
-            className="w-full bg-[#FFFF00] text-black font-bangers tracking-wider text-3xl py-4 border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_rgba(0,0,0,1)] transition-all md:col-span-2"
+            className="w-full bg-[#FFFF00] text-black font-black text-2xl py-4 border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_rgba(0,0,0,1)] transition-all md:col-span-2"
           >
             COPY PROMPT!
           </button>
@@ -96,7 +96,7 @@ export default function ResultPage() {
           <a 
             href={`https://twitter.com/intent/tweet?text=${shareText}`}
             target="_blank" rel="noreferrer"
-            className="w-full bg-black text-white font-bangers tracking-wider text-2xl py-4 border-4 border-black flex justify-center items-center gap-2 hover:bg-gray-800 transition-colors"
+            className="w-full bg-black text-white font-black text-xl py-4 border-4 border-black flex justify-center items-center gap-2 hover:bg-gray-800 transition-colors"
           >
             <span className="text-red-500">🐦</span> SHARE ON X
           </a>
@@ -104,7 +104,7 @@ export default function ResultPage() {
           <a 
             href={`https://api.whatsapp.com/send?text=${shareText}`}
             target="_blank" rel="noreferrer"
-            className="w-full bg-[#25D366] text-white font-bangers tracking-wider text-2xl py-4 border-4 border-black flex justify-center items-center gap-2 hover:bg-green-500 transition-colors shadow-[4px_4px_0_rgba(0,0,0,1)]"
+            className="w-full bg-[#25D366] text-white font-black text-xl py-4 border-4 border-black flex justify-center items-center gap-2 hover:bg-green-500 transition-colors shadow-[4px_4px_0_rgba(0,0,0,1)]"
           >
             <span>💬</span> WHATSAPP
           </a>
@@ -115,7 +115,7 @@ export default function ResultPage() {
         <AdPlaceholder />
       </div>
 
-      <footer className="mt-12 mb-4 text-center font-bangers text-xl tracking-wider w-full py-4 border-t-4 border-black bg-[#FFFF00]">
+      <footer className="mt-12 mb-4 text-center font-black text-lg w-full py-4 border-t-4 border-black bg-[#FFFF00]">
         © 2026 RETRO PARADOX | AI PROMPT LAB
       </footer>
 
