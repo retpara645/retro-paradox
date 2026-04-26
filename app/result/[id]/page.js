@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import CopyPromptButton from './CopyPromptButton';
-import AdPlaceholder from '@/app/components/AdPlaceholder';
 import ShareButtons from '@/app/components/ShareButtons';
 import { useEffect, useState } from 'react';
 
@@ -174,9 +173,6 @@ export default function ResultPage() {
         <ShareButtons title={title} />
       </div>
 
-      <div style={{ marginTop: '4rem' }}>
-        <AdPlaceholder />
-      </div>
     </div>
   );
 }

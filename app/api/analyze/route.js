@@ -95,7 +95,6 @@ export async function POST(req) {
     const title = snippet.title;
     const description = snippet.description;
     
-    // Parse duration
     const durationIso = ytData.items[0].contentDetails?.duration;
     const humanDuration = parseDuration(durationIso);
     

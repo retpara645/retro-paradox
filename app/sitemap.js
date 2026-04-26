@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 export default function sitemap() {
-  const baseUrl = 'https://theguh-workshop.com'; // Replace with real domain later
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.retpara.com';
   
   const routes = [
     {
@@ -10,6 +10,24 @@ export default function sitemap() {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
     },
   ];
 
@@ -24,7 +42,7 @@ export default function sitemap() {
           url: `${baseUrl}/result/${id}`,
           lastModified: new Date(item.timestamp || Date.now()),
           changeFrequency: 'never',
-          priority: 0.8,
+          priority: 0.7,
         };
       });
       
