@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getCache, setCache } from '@/lib/cache';
 
+export const maxDuration = 60; // Allow up to 60 seconds for Vercel Hobby tier
+
 // Using @google/genai for Gemini
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -9,7 +11,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const ipRateLimitMap = new Map();
 
 function checkIpRateLimit(ip) {
-  if (!ip || ip === 'unknown' || ip === '::1' || ip === '127.0.0.1') return true; // In production, Vercel will pass the real IP in x-forwarded-for
+  if (!ip || ip === 'unknown' || ip === '::1' || ip === '127.0.0.1') return true; 
   
   const now = Date.now();
   const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -21,13 +23,12 @@ function checkIpRateLimit(ip) {
   }
   
   if (now - record.firstRequest > ONE_DAY) {
-    // Reset after 24 hours
     ipRateLimitMap.set(ip, { count: 1, firstRequest: now });
     return true;
   }
   
   if (record.count >= 3) {
-    return false; // Limit exceeded
+    return false;
   }
   
   record.count += 1;
@@ -39,9 +40,23 @@ function extractYouTubeId(url) {
   return match ? match[1] : null;
 }
 
+function parseDuration(isoDuration) {
+  if (!isoDuration) return "Unknown";
+  const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return isoDuration;
+  const h = match[1] ? parseInt(match[1]) : 0;
+  const m = match[2] ? parseInt(match[2]) : 0;
+  const s = match[3] ? parseInt(match[3]) : 0;
+  
+  let result = [];
+  if (h > 0) result.push(`${h} hours`);
+  if (m > 0) result.push(`${m} minutes`);
+  if (s > 0) result.push(`${s} seconds`);
+  return result.join(' ') || "0 seconds";
+}
+
 export async function POST(req) {
   try {
-    // Get IP from headers (works for Vercel/proxies)
     const ip = req.headers.get('x-forwarded-for') || req.ip || 'unknown';
     
     if (!checkIpRateLimit(ip)) {
@@ -60,17 +75,15 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 });
     }
 
-    // 1. Check Cache
     const cachedResult = getCache(videoId);
     if (cachedResult) {
       return NextResponse.json({ result: cachedResult, cached: true, videoId });
     }
 
-    // 2. Fetch YouTube Metadata
     const ytApiKey = process.env.YOUTUBE_API_KEY;
     if (!ytApiKey) throw new Error('YouTube API Key missing');
 
-    const ytUrl = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet&key=${ytApiKey}`;
+    const ytUrl = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet,contentDetails&key=${ytApiKey}`;
     const ytRes = await fetch(ytUrl);
     const ytData = await ytRes.json();
 
@@ -82,7 +95,10 @@ export async function POST(req) {
     const title = snippet.title;
     const description = snippet.description;
     
-    // Get highest quality thumbnail
+    // Parse duration
+    const durationIso = ytData.items[0].contentDetails?.duration;
+    const humanDuration = parseDuration(durationIso);
+    
     const thumbnails = snippet.thumbnails;
     const thumbnailObj = thumbnails.maxres || thumbnails.high || thumbnails.medium || thumbnails.default;
     const thumbnailUrl = thumbnailObj?.url;
@@ -91,12 +107,10 @@ export async function POST(req) {
       throw new Error('Could not find video thumbnail');
     }
 
-    // 3. Fetch Image Buffer for Gemini
     const imgRes = await fetch(thumbnailUrl);
     if (!imgRes.ok) throw new Error('Failed to download thumbnail');
     const arrayBuffer = await imgRes.arrayBuffer();
     
-    // Create generative part object
     const imagePart = {
       inlineData: {
         data: Buffer.from(arrayBuffer).toString("base64"),
@@ -104,16 +118,18 @@ export async function POST(req) {
       }
     };
 
-    // 4. Call Gemini
     const prompt = `Analyze this video based on its thumbnail, title, and description.
 Title: ${title}
 Description: ${description}
+Actual Video Duration: ${humanDuration}
 
-Based on its visual style, lighting, and elements, create a detailed, simulated storyboard breakdown for AI video/image generation. Since you only have the thumbnail, imagine 3-5 logical chronological scenes that would occur in this video.
+CRITICAL INSTRUCTION: The actual video duration is exactly ${humanDuration}. Your generated time_codes MUST NOT exceed this duration! Distribute the scenes logically within the ${humanDuration} timeframe. Do not hallucinate long durations for short videos.
+
+Based on its visual style, lighting, and elements, create a detailed, simulated storyboard breakdown for AI video/image generation. Since you only have the thumbnail, imagine scenes that would accurately fit into this ${humanDuration} video.
 Also, accurately determine the aspect ratio of the video (e.g., output "9:16" if it's a vertical/Shorts video, or "16:9" if it's a standard landscape video).
 
 Output must be a structured JSON containing EXACTLY these 3 keys:
-1. "scenes": An array of objects representing the imagined scenes. Each object MUST have these exact keys: "time_code" (e.g. "00:00-00:02"), "camera_move" (e.g. "Static high-angle"), "scene" (setting description), "characters" (description of people/subjects), "actions" (what is happening).
+1. "scenes": An array of objects representing the imagined scenes. Each object MUST have these exact keys: "time_code" (e.g. "00:00-00:02", MUST NOT exceed ${humanDuration}), "camera_move" (e.g. "Static high-angle"), "scene" (setting description), "characters" (description of people/subjects), "actions" (what is happening).
 2. "aspect_ratio": "9:16 or 16:9"
 3. "aesthetic_tags": ["tag1", "tag2", "tag3"]`;
 
@@ -152,14 +168,12 @@ Output must be a structured JSON containing EXACTLY these 3 keys:
         throw new Error('Gemini returned invalid JSON');
     }
 
-    // Combine original metadata with AI structured data
     const finalResult = {
       title,
       thumbnailUrl,
       analysis: structuredData
     };
 
-    // 5. Save to Cache and Return
     setCache(videoId, finalResult);
 
     return NextResponse.json({ result: finalResult, cached: false, videoId });
