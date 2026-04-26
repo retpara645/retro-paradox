@@ -46,7 +46,8 @@ export default function Home() {
       alert("Error: " + data.error);
       setStatus('idle');
     } else {
-      // Data is cached by the backend, just redirect
+      // Store result in local storage so the result page loads instantly without hitting the API again
+      localStorage.setItem(`retpara_result_${data.videoId}`, JSON.stringify(data.result));
       window.location.href = `/result/${data.videoId}`;
     }
   };

@@ -11,7 +11,16 @@ export default function ResultPage() {
 
   useEffect(() => {
     if (id) {
-      // Fetch result from API which uses local caching
+      // First try to load instantly from localStorage
+      const cached = localStorage.getItem(`retpara_result_${id}`);
+      if (cached) {
+        try {
+          setData(JSON.parse(cached));
+          return; // Exit early if loaded from cache
+        } catch(e) {}
+      }
+
+      // Fallback: Fetch result from API if not in cache (e.g. direct link visit)
       fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -23,6 +32,7 @@ export default function ResultPage() {
           setError(resData.error);
         } else {
           setData(resData.result);
+          localStorage.setItem(`retpara_result_${id}`, JSON.stringify(resData.result));
         }
       })
       .catch(err => {
