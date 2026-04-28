@@ -46,7 +46,8 @@ export default function ResultPage() {
     }
   };
 
-  const shareText = "Check out this AI-generated prompt for a YouTube video using Retro Paradox! %0A%0A" + (typeof window !== 'undefined' ? window.location.href : '');
+  const shareText = "Check out this AI-generated prompt for a YouTube video using Retro Paradox! \n\n" + (typeof window !== 'undefined' ? window.location.href : '');
+  const encodedShareText = typeof window !== 'undefined' ? encodeURIComponent(shareText) : '';
 
   if (error) {
     return (
@@ -74,19 +75,32 @@ export default function ResultPage() {
   const tags = analysis.aesthetic_tags || [];
 
   return (
-    <main className="min-h-screen bg-[#FFFF00] p-4 md:p-8 flex flex-col items-center font-space text-black relative overflow-x-hidden" style={{ backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.15) 2px, transparent 2px)', backgroundSize: '20px 20px' }}>
+    <main className="min-h-screen bg-[#FFFF00] p-3 sm:p-4 md:p-8 flex flex-col items-center font-space text-black relative overflow-x-hidden" style={{ backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.15) 2px, transparent 2px)', backgroundSize: '20px 20px' }}>
       
+      {/* Back to Homepage Button */}
+      <a 
+        href="/"
+        className="absolute top-3 left-3 sm:top-4 sm:left-4 md:top-8 md:left-8 bg-white text-black font-black text-xs sm:text-sm md:text-lg px-3 py-1.5 sm:px-4 sm:py-2 border-2 sm:border-4 border-black shadow-[2px_2px_0_rgba(0,0,0,1)] sm:shadow-[4px_4px_0_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_rgba(0,0,0,1)] sm:hover:shadow-[6px_6px_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-xl z-50 flex items-center gap-1 sm:gap-2"
+      >
+        &larr; <span className="hidden sm:inline">BACK TO HOMEPAGE</span><span className="sm:hidden">HOME</span>
+      </a>
+
       {/* Decorative Stars */}
       <div className="absolute top-20 left-10 text-5xl transform -rotate-12 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">✨</div>
       <div className="absolute top-80 right-10 text-6xl transform rotate-12 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">⚡</div>
       <div className="absolute bottom-40 left-10 text-6xl transform -rotate-12 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">⚡</div>
       <div className="absolute bottom-80 right-20 text-5xl transform rotate-12 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">✨</div>
-
-      <div className="w-full max-w-4xl bg-[#002366] border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-6 md:p-10 flex flex-col gap-6 relative z-10 my-8 rounded-3xl">
+      
+      {/* Content Container */}
+      <div className="w-full max-w-4xl bg-[#002366] border-4 border-black p-4 sm:p-6 md:p-10 mt-16 sm:mt-14 md:mt-8 mb-10 flex flex-col gap-4 sm:gap-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] z-10 rounded-2xl sm:rounded-3xl relative">
         
-        <h1 className="text-4xl md:text-5xl font-black text-[#FFFF00] mb-4 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#FFFF00] mb-2 sm:mb-4 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
           AI VISUAL ANALYSIS
         </h1>
+
+        <div className="absolute top-[-15px] sm:top-[-20px] right-2 sm:right-[-20px] bg-[#FFFF00] border-4 border-black px-3 sm:px-6 py-1 sm:py-2 text-xl sm:text-3xl font-black shadow-[4px_4px_0_rgba(0,0,0,1)] transform rotate-3 z-20 whitespace-nowrap text-black">
+          VIBE ANALYZED!
+        </div>
 
         <div className="flex flex-col gap-4">
           {scenes.map((scene, index) => (
@@ -118,13 +132,22 @@ export default function ResultPage() {
           </div>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-8 flex flex-col sm:flex-row flex-wrap gap-4 items-center">
           <button 
             onClick={handleCopy}
-            className="bg-[#FFFF00] text-black font-black text-2xl py-4 px-8 border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_rgba(0,0,0,1)] transition-all rounded-2xl"
+            className="w-full sm:w-auto bg-[#FFFF00] text-black font-black text-xl sm:text-2xl py-3 px-6 sm:py-4 sm:px-8 border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_rgba(0,0,0,1)] transition-all rounded-xl sm:rounded-2xl flex items-center justify-center"
           >
             COPY PROMPT!
           </button>
+
+          <a 
+            href={`https://x.com/intent/tweet?text=${encodedShareText}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto bg-black text-white font-black text-xl sm:text-2xl py-3 px-6 sm:py-4 sm:px-8 border-4 border-[#3b82f6] shadow-[4px_4px_0_rgba(59,130,246,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_rgba(59,130,246,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_rgba(59,130,246,1)] transition-all rounded-xl sm:rounded-2xl flex items-center justify-center"
+          >
+            SHARE TO 𝕏
+          </a>
         </div>
 
       </div>

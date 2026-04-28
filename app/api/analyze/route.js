@@ -27,7 +27,7 @@ function checkIpRateLimit(ip) {
     return true;
   }
   
-  if (record.count >= 3) {
+  if (record.count >= 10) {
     return false;
   }
   
@@ -66,21 +66,51 @@ export async function POST(req) {
     }
 
     const body = await req.json();
-    const { url } = body;
+    const { url, frames, fileName } = body;
 
-    if (!url) {
-      return NextResponse.json({ error: 'URL is required' }, { status: 400 });
+    if (!url && !frames) {
+      return NextResponse.json({ error: 'URL or Video Frames are required' }, { status: 400 });
     }
 
-    const videoId = extractYouTubeId(url);
-    if (!videoId) {
-      return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 });
-    }
+    let title, thumbnailUrl, videoId, prompt, geminiContents;
 
-    const cachedResult = getCache(videoId);
-    if (cachedResult) {
-      return NextResponse.json({ result: cachedResult, cached: true, videoId });
-    }
+    if (frames) {
+      // --- LOCAL VIDEO LOGIC ---
+      videoId = "local_" + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+      title = fileName || "Local Video Upload";
+      thumbnailUrl = "/icon.jpg"; // Placeholder or we could use the first frame
+      
+      const contents = frames.map(f => ({
+        inlineData: {
+          data: f.image,
+          mimeType: 'image/jpeg'
+        }
+      }));
+      
+      const timecodesList = frames.map(f => f.timecode).join(', ');
+      
+      prompt = `You are an expert AI Video Prompt Engineer. I am providing you with sequential frames extracted exactly every 8 seconds from a video. Your job is to analyze each frame and generate a highly detailed, copy-paste ready text prompt to recreate that exact visual style, subject, and camera angle. You MUST format your output strictly divided by these 8-second blocks. Do not merge scenes. Provide the output as: ${frames[0]?.timecode || '[00:00 - 00:08]'}: \n ... etc.
+
+The frames correspond sequentially to these timecodes: ${timecodesList}.
+
+Output must be a structured JSON containing EXACTLY these 3 keys:
+1. "scenes": An array of objects. Each object MUST have these exact keys: "time_code" (use exactly the timecodes provided, e.g. "[00:00 - 00:08]"), "camera_move" (e.g. "Static high-angle"), "scene" (setting description), "characters" (description of people/subjects), "actions" (what is happening). Ensure you generate exactly one scene per timecode block provided.
+2. "aspect_ratio": "9:16 or 16:9"
+3. "aesthetic_tags": ["tag1", "tag2", "tag3"]`;
+
+      geminiContents = [ prompt, ...contents ];
+
+    } else {
+      // --- YOUTUBE URL LOGIC ---
+      videoId = extractYouTubeId(url);
+      if (!videoId) {
+        return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 });
+      }
+
+      const cachedResult = getCache(videoId);
+      if (cachedResult) {
+        return NextResponse.json({ result: cachedResult, cached: true, videoId });
+      }
 
     const ytApiKey = process.env.YOUTUBE_API_KEY;
     if (!ytApiKey) throw new Error('YouTube API Key missing');
@@ -121,7 +151,7 @@ export async function POST(req) {
       }
     };
 
-    const prompt = `Analyze this video based on its thumbnail, title, and description.
+      prompt = `Analyze this video based on its thumbnail, title, and description.
 Title: ${title}
 Description: ${description}
 Actual Video Duration: ${humanDuration} (${totalSeconds} total seconds)
@@ -136,6 +166,9 @@ Output must be a structured JSON containing EXACTLY these 3 keys:
 2. "aspect_ratio": "9:16 or 16:9"
 3. "aesthetic_tags": ["tag1", "tag2", "tag3"]`;
 
+      geminiContents = [ prompt, imagePart ];
+    }
+
     let response;
     const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest'];
     let lastError = null;
@@ -144,7 +177,7 @@ Output must be a structured JSON containing EXACTLY these 3 keys:
         try {
             response = await ai.models.generateContent({
                 model: modelName,
-                contents: [ prompt, imagePart ],
+                contents: geminiContents,
                 config: { responseMimeType: "application/json" }
             });
             break;
@@ -177,7 +210,9 @@ Output must be a structured JSON containing EXACTLY these 3 keys:
       analysis: structuredData
     };
 
-    setCache(videoId, finalResult);
+    if (!frames) {
+      setCache(videoId, finalResult);
+    }
 
     return NextResponse.json({ result: finalResult, cached: false, videoId });
 
