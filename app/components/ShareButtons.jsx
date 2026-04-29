@@ -6,6 +6,7 @@ export default function ShareButtons({ title }) {
   const [url, setUrl] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line
     setUrl(window.location.href);
   }, []);
 

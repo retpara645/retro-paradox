@@ -43,7 +43,7 @@ export default function ContactPage() {
         </h2>
         
         <div style={{ fontSize: '1.1rem', lineHeight: '1.8', fontWeight: 600 }}>
-          <p style={{ marginBottom: '1rem' }}>Have a question about our AI Prompt Lab, a suggestion for a new feature, or a business inquiry? We'd love to hear from you.</p>
+          <p style={{ marginBottom: '1rem' }}>Have a question about our AI Prompt Lab, a suggestion for a new feature, or a business inquiry? We&apos;d love to hear from you.</p>
           <p style={{ marginBottom: '2rem' }}>As a platform built for the creator community, your feedback helps us fine-tune our tools to be as precise and helpful as possible.</p>
 
           <h3 style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, textTransform: 'uppercase', marginBottom: '1rem', color: 'var(--color-blue)', fontSize: '1.3rem' }}>How to Reach Us:</h3>

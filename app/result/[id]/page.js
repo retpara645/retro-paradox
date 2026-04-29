@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ResultPage() {
   const { id } = useParams();
@@ -13,6 +14,7 @@ export default function ResultPage() {
       const cached = localStorage.getItem(`retpara_result_${id}`);
       if (cached) {
         try {
+          // eslint-disable-next-line
           setData(JSON.parse(cached));
           return;
         } catch(e) {}
@@ -51,7 +53,7 @@ export default function ResultPage() {
         <div className="bg-white p-8 border-4 border-black shadow-[8px_8px_0_rgba(0,0,0,1)] text-center rounded-3xl">
           <h2 className="text-4xl font-black text-[#FF0000] mb-4">ERROR</h2>
           <p className="font-bold text-xl">{error}</p>
-          <a href="/" className="mt-6 inline-block bg-[#002366] text-white px-6 py-3 border-4 border-black font-black text-xl shadow-[4px_4px_0_rgba(0,0,0,1)] hover:bg-[#003399] rounded-xl">BACK HOME</a>
+          <Link href="/" className="mt-6 inline-block bg-[#002366] text-white px-6 py-3 border-4 border-black font-black text-xl shadow-[4px_4px_0_rgba(0,0,0,1)] hover:bg-[#003399] rounded-xl">BACK HOME</Link>
         </div>
       </main>
     );

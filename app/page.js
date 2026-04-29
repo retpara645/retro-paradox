@@ -11,6 +11,7 @@ export default function Home() {
   useEffect(() => {
     const savedUsages = localStorage.getItem('retpara_usages');
     if (savedUsages) {
+      // eslint-disable-next-line
       setUsages(parseInt(savedUsages));
     }
   }, []);
