@@ -4,6 +4,9 @@ import Link from 'next/link';
 export const metadata = {
   title: 'About | Retro Paradox',
   description: 'About Retro Paradox',
+  alternates: {
+    canonical: '/about',
+  },
 };
 
 export default function AboutPage() {

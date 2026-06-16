@@ -2,33 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .bg-halftone {
-    background-color: #FFFF00;
-    /* Made the halftone pattern very subtle (opacity 0.05) */
-    background-image: radial-gradient(rgba(0, 0, 0, 0.05) 2px, transparent 2px);
-    background-size: 20px 20px;
-    background-position: 0 0, 10px 10px;
-  }
-}
-
 body {
   margin: 0;
   padding: 0;
-  background-color: #FFFF00;
-  color: #000000;
+  background-color: #ffffff;
+  color: #111111;
+  overflow-x: hidden;
 }
 
-/* Scrollbar styling for a retro look */
+/* Minimalist scrollbar */
 ::-webkit-scrollbar {
-  width: 12px;
-  border-left: 2px solid #000;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #002366; /* retro-blue */
+  background: transparent; 
 }
 ::-webkit-scrollbar-thumb {
-  background: #FF0000; /* retro-red */
-  border: 2px solid #000;
-  border-radius: 8px;
+  background: #cbd5e1; 
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; 
 }

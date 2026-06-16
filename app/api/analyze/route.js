@@ -1,39 +1,12 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { getCache, setCache } from '@/lib/cache';
+import { getCache, setCache, checkRateLimit } from '@/lib/cache';
 
 export const maxDuration = 60; // Allow up to 60 seconds for Vercel Hobby tier
 
 // Using @google/genai for Gemini
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// Strict backend IP-based rate limiter (max 3 requests per 24 hours)
-const ipRateLimitMap = new Map();
-
-function checkIpRateLimit(ip) {
-  if (!ip || ip === 'unknown' || ip === '::1' || ip === '127.0.0.1') return true; 
-  
-  const now = Date.now();
-  const ONE_DAY = 24 * 60 * 60 * 1000;
-  
-  const record = ipRateLimitMap.get(ip);
-  if (!record) {
-    ipRateLimitMap.set(ip, { count: 1, firstRequest: now });
-    return true;
-  }
-  
-  if (now - record.firstRequest > ONE_DAY) {
-    ipRateLimitMap.set(ip, { count: 1, firstRequest: now });
-    return true;
-  }
-  
-  if (record.count >= 10) {
-    return false;
-  }
-  
-  record.count += 1;
-  return true;
-}
 
 function extractYouTubeId(url) {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
@@ -61,7 +34,7 @@ export async function POST(req) {
   try {
     const ip = req.headers.get('x-forwarded-for') || req.ip || 'unknown';
     
-    if (!checkIpRateLimit(ip)) {
+    if (!(await checkRateLimit(ip))) {
       return NextResponse.json({ error: 'Limit reached. Come back tomorrow!' }, { status: 429 });
     }
 
@@ -107,7 +80,7 @@ Output must be a structured JSON containing EXACTLY these 3 keys:
         return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 });
       }
 
-      const cachedResult = getCache(videoId);
+      const cachedResult = await getCache(videoId);
       if (cachedResult) {
         return NextResponse.json({ result: cachedResult, cached: true, videoId });
       }
@@ -211,7 +184,7 @@ Output must be a structured JSON containing EXACTLY these 3 keys:
     };
 
     if (!frames) {
-      setCache(videoId, finalResult);
+      await setCache(videoId, finalResult);
     }
 
     return NextResponse.json({ result: finalResult, cached: false, videoId });

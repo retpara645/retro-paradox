@@ -1,37 +1,57 @@
 import './globals.css'
 import { Analytics } from "@vercel/analytics/react";
+import Script from 'next/script';
+import { Inter, Playfair_Display } from 'next/font/google';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+});
 
 export const metadata = {
   metadataBase: new URL('https://www.retpara.com'),
-  title: 'Retro Paradox | AI Video Analyzer & Prompt Generator',
-  description: 'Upload a local video or paste a YouTube URL to instantly generate highly detailed, 8-second segmented AI prompts. Built with a stunning Neo-Brutalist Soft Pop Art aesthetic.',
-  keywords: ['AI video analyzer', 'AI prompt generator', 'video to prompt', 'YouTube analyzer', 'Gemini AI video', 'Midjourney prompt', 'Sora video prompt', 'retro paradox', 'AI video generation'],
+  alternates: {
+    canonical: '/',
+  },
+  title: 'Retro Paradox | Support Center',
+  description: 'Selamat Datang di Pusat Bantuan Retro Paradox. Jika Anda mengalami kendala terkait produk digital, tim kami siap membantu.',
+  keywords: ['retro paradox', 'support', 'bantuan', 'digital products', 'marketplaceai'],
   authors: [{ name: 'Retro Paradox Team' }],
   openGraph: {
-    title: 'Retro Paradox | AI Video Analyzer',
-    description: 'Instantly generate detailed AI video prompts from any YouTube link or local video.',
+    title: 'Retro Paradox | Support Center',
+    description: 'Pusat Bantuan Resmi Retro Paradox. Kami siap memandu Anda mengatur produk digital Anda.',
     url: 'https://www.retpara.com',
-    siteName: 'Retro Paradox',
+    siteName: 'Retro Paradox Support',
     images: [
       {
-        url: '/retro_paradox_avatar.jpg',
+        url: '/logo.png',
         width: 1200,
         height: 630,
-        alt: 'Retro Paradox Thumbnail'
+        alt: 'Retro Paradox Logo'
       },
     ],
-    locale: 'en_US',
+    locale: 'id_ID',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Retro Paradox | AI Video Analyzer',
-    description: 'Instantly generate detailed AI video prompts from any YouTube link or local video.',
-    images: ['/retro_paradox_avatar.jpg'],
+    title: 'Retro Paradox | Support Center',
+    description: 'Pusat Bantuan Resmi Retro Paradox.',
+    images: ['/logo.png'],
   },
   robots: {
     index: true,
     follow: true,
+  },
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
   }
 }
 
@@ -39,11 +59,26 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Space+Grotesk:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-M9D1GHCGQ2"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-M9D1GHCGQ2', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
       </head>
-      <body className="font-space min-h-screen">
+      <body className={`${inter.variable} ${playfair.variable} font-sans min-h-screen bg-white text-gray-900 antialiased selection:bg-pink-100 selection:text-pink-900`}>
         {children}
         <Analytics />
       </body>

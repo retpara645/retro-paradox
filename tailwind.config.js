@@ -6,28 +6,30 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        'retro-yellow': '#FFFF00',
-        'retro-blue': '#002366',
-        'retro-red': '#FF0000',
-      },
       fontFamily: {
-        bangers: ['Bangers', 'cursive'],
-        space: ['"Space Grotesk"', 'sans-serif'],
-        mono: ['"Space Mono"', 'monospace'],
+        sans: ['var(--font-inter)', 'sans-serif'],
+        serif: ['var(--font-playfair)', 'serif'],
       },
-      boxShadow: {
-        'comic': '8px 8px 0px 0px rgba(0,0,0,1)',
-        'comic-hover': '12px 12px 0px 0px rgba(0,0,0,1)',
-        'comic-active': '0px 0px 0px 0px rgba(0,0,0,1)',
+      backgroundImage: {
+        'mesh-gradient': 'radial-gradient(at 10% 20%, hsla(28,100%,74%,1) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(355,100%,93%,1) 0px, transparent 50%), radial-gradient(at 80% 50%, hsla(340,100%,76%,1) 0px, transparent 50%), radial-gradient(at 0% 100%, hsla(22,100%,77%,1) 0px, transparent 50%), radial-gradient(at 80% 100%, hsla(242,100%,70%,1) 0px, transparent 50%), radial-gradient(at 0% 0%, hsla(343,100%,76%,1) 0px, transparent 50%)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out',
+        'fade-in': 'fadeIn 0.8s ease-out',
+        'fade-up': 'fadeUp 0.8s ease-out',
+        'float': 'float 6s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
+        },
+        fadeUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-15px)' },
         }
       }
     },

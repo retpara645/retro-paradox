@@ -3,6 +3,9 @@ import Link from 'next/link';
 export const metadata = {
   title: 'Privacy Policy | Retro Paradox',
   description: 'Privacy Policy for Retro Paradox',
+  alternates: {
+    canonical: '/privacy',
+  },
 };
 
 export default function PrivacyPage() {

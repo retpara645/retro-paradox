@@ -3,6 +3,9 @@ import Link from 'next/link';
 export const metadata = {
   title: 'Contact Us | Retro Paradox',
   description: 'Contact Retro Paradox',
+  alternates: {
+    canonical: '/contact',
+  },
 };
 
 export default function ContactPage() {
